@@ -1,4 +1,4 @@
-const Usuario = require('../models/usuario');
+const Usuario = require('../models/Usuario');
 const { validationResult } = require('express-validator');
 
 const crearUsuario = async (req, res) => {

@@ -1,4 +1,4 @@
-const Usuario = require('../models/UsuarioModel'); 
+const Usuario = require('../models/Usuario'); 
 const authService = require('../auth/AuthService'); 
 
 const login = async (req, res) => {
