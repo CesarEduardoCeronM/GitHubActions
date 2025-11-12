@@ -2,62 +2,46 @@ name: Node CI with Docker
 
 on:
   push:
-    [cite_start]# [cite: 54]
     branches: [ "main" ]
   pull_request:
-    [cite_start]# [cite: 57]
-    branches: [ "main" ] 
+    branches: [ "main" ]
 
 jobs:
-  [cite_start]# [cite: 58]
   test:
-    [cite_start]# [cite: 59]
     runs-on: ubuntu-latest
-    [cite_start]# [cite: 60-70]
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
+        
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
           cache: 'npm'
+          
       - name: Instalar dependencias
         run: npm ci
+        
       - name: Ejecutar pruebas
         run: npm test
 
   build-and-push-docker:
-    [cite_start]# [cite: 82]
-    [cite_start]needs: test
-    [cite_start]# [cite: 83]
+    needs: test
     runs-on: ubuntu-latest
     steps:
-      [cite_start]# [cite: 85]
       - name: Checkout del código
         uses: actions/checkout@v4
-
-      [cite_start]# [cite: 101]
+      
       - name: Login en Docker Hub
-        [cite_start]# [cite: 102]
         uses: docker/login-action@v3
-        [cite_start]# [cite: 103]
         with:
-          [cite_start]# [cite: 104]
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          [cite_start]# [cite: 105]
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      [cite_start]# [cite: 106]
+      
       - name: Build y push a Docker Hub
-        [cite_start]# [cite: 107]
         uses: docker/build-push-action@v6
-        [cite_start]# [cite: 108]
         with:
-          [cite_start]# [cite: 109, 110]
           context: .
           file: ./Dockerfile
-          [cite_start]# [cite: 111]
           push: true
-          [cite_start]# 
-          tags: tu-usuario-dockerhub/mi-app:latest # <-- !! CAMBIA ESTO !!
+          tags: cecm1010/mi-app:latest
