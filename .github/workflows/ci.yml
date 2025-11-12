@@ -60,4 +60,4 @@ jobs:
           [cite_start]# [cite: 111]
           push: true
           [cite_start]# 
-          tags: tu-usuario-dockerhub/mi-app:latest # <-- !! CAMBIA ESTO !!
+          tags: cecm1010/mi-app:latest
