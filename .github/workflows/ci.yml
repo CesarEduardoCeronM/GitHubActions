@@ -12,7 +12,13 @@ jobs:
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
-        
+      
+      - name: Crear llaves RSA desde Secretos
+        run: |
+          mkdir -p auth/keys
+          echo "${{ secrets.PRIVATE_KEY }}" > auth/keys/private.key
+          echo "${{ secrets.PUBLIC_KEY }}" > auth/keys/public.key
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
