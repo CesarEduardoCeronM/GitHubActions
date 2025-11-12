@@ -44,4 +44,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+<<<<<<< HEAD
           tags: cecm1010/mi-app:latest
+=======
+          [cite_start]# 
+          tags: cecm1010/mi-app:latest
+>>>>>>> e35a138ca94b267ec652c0430e4105384225be9a
