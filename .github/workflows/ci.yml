@@ -44,6 +44,13 @@ jobs:
         run: npm ci
         
       - name: Ejecutar pruebas
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: usuarios_db
+          DB_PORT: 3306
+          PORT: 8085
         run: npm test
 
   build-and-push-docker:
