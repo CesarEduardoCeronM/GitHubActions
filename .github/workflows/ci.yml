@@ -1,4 +1,4 @@
-name: Node CI with Docker
+name: Node CI/CD to EC2
 
 on:
   push:
@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       mysql:
         image: mysql:latest
@@ -28,7 +27,7 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
       
-      - name: Crear llaves RSA desde Secretos
+      - name: Crear llaves RSA temporales para pruebas
         run: |
           mkdir -p auth/keys
           echo "${{ secrets.PRIVATE_KEY }}" > auth/keys/private.key
@@ -72,4 +71,44 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: cecm1010/mi-app:latest
+          tags: cecm1010/mi-app:latest 
+
+  deploy-ec2:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy a EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker network create app-network || true
+
+            docker stop mysql-db || true
+            docker rm mysql-db || true
+            
+            docker run -d --name mysql-db --network app-network \
+              -e MYSQL_ROOT_PASSWORD=root \
+              -e MYSQL_DATABASE=usuarios_db \
+              mysql:latest
+            
+            sleep 15
+
+            mkdir -p /home/${{ secrets.EC2_USER }}/app/keys
+            echo "${{ secrets.PRIVATE_KEY }}" > /home/${{ secrets.EC2_USER }}/app/keys/private.key
+            echo "${{ secrets.PUBLIC_KEY }}" > /home/${{ secrets.EC2_USER }}/app/keys/public.key
+
+            docker pull cecm1010/mi-app:latest
+            docker stop mi-app || true
+            docker rm mi-app || true
+
+            docker run -d --name mi-app -p 8085:8085 --network app-network \
+              -v /home/${{ secrets.EC2_USER }}/app/keys:/app/auth/keys \
+              -e PORT=8085 \
+              -e DB_HOST=mysql-db \
+              -e DB_USER=root \
+              -e DB_PASSWORD=root \
+              -e DB_NAME=usuarios_db \
+              cecm1010/mi-app:latest
